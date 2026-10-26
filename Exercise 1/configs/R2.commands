@@ -1,0 +1,48 @@
+! Applied changes, not full running-config
+configure terminal
+ipv6 unicast-routing
+username R1 password cisco
+interface g0/0
+ no shutdown
+interface g0/0.1
+ encapsulation dot1Q 1
+ ip address 192.168.1.193 255.255.255.224
+interface g0/0.15
+ encapsulation dot1Q 15
+ ip address 192.168.1.1 255.255.255.128
+interface g0/0.25
+ encapsulation dot1Q 25
+ ip address 192.168.1.129 255.255.255.192
+ ipv6 address FE80::2 link-local
+ ipv6 address 2001:DB8:A:25::1/64
+interface g0/0.99
+ encapsulation dot1Q 99 native
+ ip address 192.168.1.225 255.255.255.224
+interface s0/0/0
+ encapsulation ppp
+ ppp authentication chap
+exit
+ipv6 route ::/0 s0/0/0
+router ospf 1
+ router-id 2.2.2.2
+ network 10.1.1.0 0.0.0.3 area 0
+ network 192.168.1.192 0.0.0.31 area 0
+ network 192.168.1.0 0.0.0.127 area 0
+ network 192.168.1.128 0.0.0.63 area 0
+ network 192.168.1.224 0.0.0.31 area 0
+exit
+ipv6 router ospf 1
+ router-id 2.2.2.2
+exit
+interface g0/0.1
+ ipv6 ospf 1 area 0
+interface g0/0.15
+ ipv6 ospf 1 area 0
+interface g0/0.25
+ ipv6 ospf 1 area 0
+interface g0/0.99
+ ipv6 ospf 1 area 0
+interface s0/0/0
+ ipv6 ospf 1 area 0
+end
+write memory

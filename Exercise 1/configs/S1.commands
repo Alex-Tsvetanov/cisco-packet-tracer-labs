@@ -1,0 +1,27 @@
+! Applied changes, not full running-config
+configure terminal
+vlan 15
+vlan 25
+vlan 99
+vlan 86
+ name BlackHole
+exit
+interface f0/1
+ switchport mode trunk
+ switchport trunk native vlan 99
+interface range f0/7-18
+ switchport mode access
+ switchport access vlan 15
+interface range f0/19-24
+ switchport mode access
+ switchport access vlan 25
+interface range f0/2-6
+ switchport mode access
+ switchport access vlan 86
+ shutdown
+interface range g0/1-2
+ switchport mode access
+ switchport access vlan 86
+ shutdown
+end
+write memory

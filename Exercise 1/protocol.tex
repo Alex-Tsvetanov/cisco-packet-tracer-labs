@@ -1,0 +1,301 @@
+\documentclass[12pt]{article}
+
+% Preamble and title page follow the TU-Sofia thesis template (Bulgarian layout,
+% same faculty heading and typography).
+
+\usepackage{cmap}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[bulgarian]{babel}
+
+% --- Typography ---
+\usepackage{tempora}
+\usepackage[top=2.5cm, bottom=2.5cm, left=3.0cm, right=2.0cm, a4paper]{geometry}
+\usepackage{setspace}
+\setstretch{1.5}
+\usepackage[none]{hyphenat}
+\usepackage[expansion=false]{microtype}
+\emergencystretch=1.5em
+\sloppy
+\usepackage{indentfirst}
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0pt}
+
+% --- Page numbering (bottom right) ---
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[R]{\thepage}
+
+% --- Footnotes ---
+\usepackage[hang,flushmargin]{footmisc}
+\usepackage{ragged2e}
+\renewcommand{\footnotelayout}{\fontsize{10}{12}\selectfont\setstretch{1.0}\justifying}
+
+% --- Sections ---
+\usepackage{titlesec}
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+
+\titleformat{\section}[block]
+  {\fontsize{14}{16.8}\bfseries\centering}
+  {\thesection. }
+  {0pt}
+  {\MakeUppercase}
+
+\titleformat{\subsection}[block]
+  {\fontsize{14}{16.8}\bfseries}
+  {\thesubsection. }
+  {0pt}
+  {}
+\titlespacing*{\subsection}{1.25cm}{*3}{*2}
+
+% --- Table of contents ---
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\l@section}{#1}{\MakeUppercase{#1}}{}{}
+\makeatother
+\usepackage[titles]{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsubsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsecfont}{\fontsize{12}{14}\bfseries}
+\renewcommand{\cftsecpagefont}{\fontsize{12}{14}\bfseries}
+\renewcommand{\cftsecaftersnum}{.}
+\renewcommand{\cftsubsecaftersnum}{.}
+
+% --- Captions ---
+\usepackage{caption}
+\DeclareCaptionLabelFormat{tablelabel}{Таблица #2}
+\captionsetup[table]{
+    labelformat=tablelabel,
+    labelsep=period,
+    font={bf,small},
+    justification=centering,
+    singlelinecheck=true
+}
+
+% --- Other ---
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{needspace}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,columns=fullflexible,keepspaces=true,frame=single}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[hidelinks]{hyperref}
+
+\begin{document}
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+\begin{center}
+{\fontsize{18}{21.6}\selectfont\bfseries ТЕХНИЧЕСКИ УНИВЕРСИТЕТ -- СОФИЯ\par}
+\vspace{0.5cm}
+{\fontsize{16}{19.2}\selectfont\bfseries ФАКУЛТЕТ „КОМПЮТЪРНИ СИСТЕМИ И ТЕХНОЛОГИИ“\par}
+\vspace{0.6cm}
+\includegraphics[width=0.28\linewidth]{images/tu_logo.png}
+\vspace{0.8cm}
+
+{\fontsize{20}{24}\selectfont\bfseries VLAN, PPP И МАРШРУТИЗАЦИЯ В IPv4/IPv6 МРЕЖИ\par}
+\vspace{0.8cm}
+{\fontsize{14}{16.8}\selectfont\bfseries ЛАБОРАТОРЕН ПРОТОКОЛ\par}
+\vspace{0.3cm}
+{\fontsize{13}{15.6}\selectfont Упражнение 1\par Cisco Packet Tracer\par}
+\vfill
+\begin{flushleft}
+{\fontsize{14}{16.8}\selectfont\bfseries Изготвил:\par}
+Алекс Цветанов\par
+Факултетен № 371326005\par
+\vspace{0.5cm}
+{\fontsize{14}{16.8}\selectfont\bfseries Преподавател:\par}
+д-р Йонка Ганчева\par
+\end{flushleft}
+\vfill
+София, 26 октомври 2026 г.
+\end{center}
+\end{titlepage}
+\hypersetup{pageanchor=true}
+\pagenumbering{roman}
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+
+\section{Цел и постановка}
+Целта на упражнението е да се осигури свързаност между локални VLAN мрежи и отдалечен уеб сървър чрез конфигуриране на междумрежова маршрутизация, PPP с CHAP, OSPF за IPv4 и IPv6 и маршрути по подразбиране. Основната задача е „Packet Tracer -- Skills Integration Challenge“. Към протокола е приложена и изпълнената предходна задача „Configuring PAP and CHAP Authentication“.
+
+Работата е изпълнена в Cisco Packet Tracer 9.0.1. Резултатите са от симулация. Показаните времена за ping описват конкретните проверки в симулатора и не са измерване на производителност на физическа мрежа.
+
+В началното състояние основната задача отчита 2/100 точки. Предварително са зададени серийните адреси на R1 и R2, част от IPv6 адресите, адресите на PC15 и управленският адрес на S1. Интерфейсът G0/0 на R2 е административно изключен, а VLAN маршрутизацията, OSPF и PPP удостоверяването не са завършени.
+
+\section{Топология и адресен план}
+\subsection{Мрежова топология}
+PC15 е свързан към F0/7 на S1 във VLAN 15. PC25 и принтерът L25 са свързани съответно към F0/19 и F0/20 във VLAN 25. Връзката S1 F0/1 -- R2 G0/0 е trunk с native VLAN 99. R2 маршрутизира между VLAN мрежите чрез подинтерфейси на G0/0.
+
+R2 S0/0/0 е свързан с R1 S0/0/0. R1 достига доставчика през S0/0/1, а зад доставчика се намира сървърът Web. Адресите на сървъра са \texttt{209.165.201.2} и \texttt{2001:DB8:B:2::2}.
+
+\subsection{Изчисляване на подмрежата за VLAN 25}
+За 50 хоста са необходими шест бита за хостовата част, тъй като $2^6-2=62\geq50$, а $2^5-2=30<50$. Следователно префиксът е /26, а маската е 255.255.255.192. Между VLAN 15 и VLAN 1 остава блокът 192.168.1.128--192.168.1.191.
+
+Подмрежата за VLAN 25 е \texttt{192.168.1.128/26}. Използваемите адреси са от .129 до .190, а broadcast адресът е .191. По условие първият адрес се задава на R2 G0/0.25, вторият -- на PC25, а последният използваем -- на L25.
+
+\begin{table}[H]
+\centering\small
+\caption{Разпределение на IPv4 адресното пространство}
+\begin{tabular}{rllll}
+\toprule
+VLAN & Мрежа & Маска & Нужни хостове & Капацитет\\
+\midrule
+15 & 192.168.1.0/25 & 255.255.255.128 & 100 & 126\\
+25 & 192.168.1.128/26 & 255.255.255.192 & 50 & 62\\
+1 & 192.168.1.192/27 & 255.255.255.224 & 20 & 30\\
+99 & 192.168.1.224/27 & 255.255.255.224 & 20 & 30\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Адреси на устройствата}
+\begin{longtable}{p{3.5cm}p{4cm}p{7cm}}
+\caption{IPv4 и IPv6 адреси в основната задача}\\
+\toprule
+Устройство / интерфейс & IPv4 адрес & IPv6 адрес\\\midrule\endfirsthead
+\toprule Устройство / интерфейс & IPv4 адрес & IPv6 адрес\\\midrule\endhead
+R1 S0/0/0 & 10.1.1.2/30 & \texttt{2001:DB8:A:A::2/64}\\
+R1 S0/0/1 & 209.165.200.226/30 & \texttt{2001:DB8:B:1::2/64}\\
+R2 S0/0/0 & 10.1.1.1/30 & \texttt{2001:DB8:A:A::1/64}\\
+R2 G0/0.1 & 192.168.1.193/27 & \texttt{2001:DB8:A:1::1/64}\\
+R2 G0/0.15 & 192.168.1.1/25 & \texttt{2001:DB8:A:15::1/64}\\
+R2 G0/0.25 & 192.168.1.129/26 & \texttt{2001:DB8:A:25::1/64}\\
+R2 G0/0.99 & 192.168.1.225/27 & \texttt{2001:DB8:A:99::1/64}\\
+S1 VLAN 99 & 192.168.1.226/27 & --\\
+PC15 & 192.168.1.2/25 & \texttt{2001:DB8:A:15::2/64}\\
+PC25 & 192.168.1.130/26 & \texttt{2001:DB8:A:25::2/64}\\
+L25 & 192.168.1.190/26 & \texttt{2001:DB8:A:25::A/64}\\
+Web & 209.165.201.2 & \texttt{2001:DB8:B:2::2/64}\\
+\bottomrule
+\end{longtable}
+Link-local адресът на R1 е \texttt{FE80::1}, а на интерфейсите на R2 -- \texttt{FE80::2}. IPv4 шлюзовете на PC15 и VLAN 25 са съответно 192.168.1.1 и 192.168.1.129. IPv6 шлюзът на трите крайни устройства е \texttt{FE80::2}. S1 използва IPv4 шлюз 192.168.1.225.
+
+\section{Изпълнение}
+\subsection{VLAN и trunk на S1}
+Създадени са VLAN 15, 25, 99 и VLAN 86 с име \texttt{BlackHole}. F0/1 е конфигуриран като статичен trunk с native VLAN 99. Портовете F0/7--F0/18 са статични access портове във VLAN 15, а F0/19--F0/24 -- във VLAN 25. Неизползваните F0/2--F0/6 и G0/1--G0/2 са преместени във VLAN 86 и административно изключени.
+\Needspace{22\baselineskip}
+\begin{lstlisting}
+vlan 86
+ name BlackHole
+interface f0/1
+ switchport mode trunk
+ switchport trunk native vlan 99
+interface range f0/7-18
+ switchport mode access
+ switchport access vlan 15
+interface range f0/19-24
+ switchport mode access
+ switchport access vlan 25
+interface range f0/2-6
+ switchport mode access
+ switchport access vlan 86
+ shutdown
+interface range g0/1-2
+ switchport mode access
+ switchport access vlan 86
+ shutdown
+\end{lstlisting}
+
+\subsection{Маршрутизация между VLAN на R2}
+Физическият интерфейс G0/0 е включен с \texttt{no shutdown}. На подинтерфейсите са зададени 802.1Q VLAN идентификаторите и съответните IPv4 адреси. За G0/0.99 е използвана командата \texttt{encapsulation dot1Q 99 native}. Създаден е G0/0.25 и е зададен адресният план за VLAN 25:
+\Needspace{8\baselineskip}
+\begin{lstlisting}
+interface g0/0.25
+ encapsulation dot1Q 25
+ ip address 192.168.1.129 255.255.255.192
+ ipv6 address FE80::2 link-local
+ ipv6 address 2001:DB8:A:25::1/64
+\end{lstlisting}
+На PC25 са зададени 192.168.1.130, маска 255.255.255.192 и шлюз 192.168.1.129. На L25 са зададени 192.168.1.190 и същата маска. Неговият предварително зададен шлюз 192.168.1.129 е запазен. Предварително зададените IPv6 адреси на крайните устройства са проверени.
+
+\subsection{PPP с CHAP между R1 и R2}
+На двата края на S0/0/0 е зададена PPP капсулация и CHAP удостоверяване. Потребителското име на всеки маршрутизатор съвпада с hostname на отсрещния, а общата парола по условие е \texttt{cisco}.
+\Needspace{13\baselineskip}
+\begin{lstlisting}
+! R1
+username R2 password cisco
+interface s0/0/0
+ encapsulation ppp
+ ppp authentication chap
+! R2
+username R1 password cisco
+interface s0/0/0
+ encapsulation ppp
+ ppp authentication chap
+\end{lstlisting}
+
+\subsection{Статични маршрути и OSPF}
+На R1 са създадени IPv4 и IPv6 маршрути по подразбиране през S0/0/1 към доставчика. На R2 е създаден IPv6 маршрут по подразбиране през S0/0/0 към R1. IPv4 маршрутът по подразбиране се разпространява от R1 чрез OSPF.
+\Needspace{19\baselineskip}
+\begin{lstlisting}
+! R1
+ip route 0.0.0.0 0.0.0.0 s0/0/1
+ipv6 route ::/0 s0/0/1
+router ospf 1
+ router-id 1.1.1.1
+ network 10.1.1.0 0.0.0.3 area 0
+ default-information originate
+! R2
+ipv6 route ::/0 s0/0/0
+router ospf 1
+ router-id 2.2.2.2
+ network 10.1.1.0 0.0.0.3 area 0
+ network 192.168.1.0 0.0.0.127 area 0
+ network 192.168.1.128 0.0.0.63 area 0
+ network 192.168.1.192 0.0.0.31 area 0
+ network 192.168.1.224 0.0.0.31 area 0
+\end{lstlisting}
+За IPv6 на двата маршрутизатора е включено \texttt{ipv6 unicast-routing}. OSPFv3 използва процес 1 и област 0, с router ID 1.1.1.1 за R1 и 2.2.2.2 за R2. Активиран е на общия сериен линк и на подинтерфейсите G0/0.1, G0/0.15, G0/0.25 и G0/0.99 на R2 чрез \texttt{ipv6 ospf 1 area 0}. Конфигурациите на R1, R2 и S1 са записани с \texttt{write memory}.
+
+\section{Проверки и резултати}
+\subsection{Оценяване на конфигурацията}
+След изпълнението PT Activity показва \textbf{100/100 точки}. В Check Results е изведено съобщение за успешно завършване на „Skills Integration Challenge“. Проверените видими елементи в Assessment Items, включително CHAP, IPv6 маршрутизацията, маршрута по подразбиране и OSPF, са означени като \texttt{Correct}.
+
+\subsection{Свързаност на крайните устройства}
+От PC15 и PC25 са изпълнени \texttt{ping 209.165.201.2} и \texttt{ping 2001:DB8:B:2::2}. Таблица~\ref{tab:ping} съдържа завършените проверки. Времената са минимално/средно/максимално RTT според изхода на Packet Tracer.
+\begin{table}[H]
+\centering\small
+\caption{Ping към Web след конфигурирането}
+\label{tab:ping}
+\begin{tabular}{lllll}
+\toprule
+Източник & Протокол & Отговори & Загуба & RTT, ms\\
+\midrule
+PC15 & IPv4, първи тест & 3/4 & 25\% & 2/11/22\\
+PC15 & IPv4, повторен & 4/4 & 0\% & 14/16/19\\
+PC15 & IPv6 & 4/4 & 0\% & 16/19/22\\
+PC25 & IPv4 & 4/4 & 0\% & 11/15/21\\
+PC25 & IPv6 & 4/4 & 0\% & 14/17/20\\
+\bottomrule
+\end{tabular}
+\end{table}
+При първия IPv4 тест от PC15 има един timeout. Повторният тест е успешен без загуба. Самият изход от ping не установява еднозначно причината за първия timeout; не е правено отделно проследяване на ARP и протоколната сходимост.
+
+\subsection{ICMP проверки от L25 и мрежовите устройства}
+Чрез Add Simple PDU са изпратени ICMP пакети към Web от L25, R1, R2 и S1. L25, R1 и R2 показват \texttt{Successful}. Първият пакет от S1 е \texttt{Failed}, а двата повторни -- \texttt{Successful}. За L25 е използван PDU тест, тъй като устройството е принтер и няма PC команден прозорец.
+
+Отделен IPv6 PDU тест от L25 не е изпълнен. Следователно за него е потвърдена IPv4 свързаността към Web, а двупротоколната крайна свързаност е потвърдена пряко от PC15 и PC25.
+
+\section{Предходна задача: PAP и CHAP}
+В задачата „Configuring PAP and CHAP Authentication“ PPP е конфигуриран на серийните връзки. PAP се използва между R1 и R3 и между R2 и R3, а CHAP -- между R3 и ISP. При PAP R1 и R2 изпращат собственото си име с парола \texttt{cisco}; R3 изпраща име R3 с парола \texttt{class}. При CHAP R3 и ISP използват обща парола \texttt{cisco}.
+
+Потвърденият резултат е \textbf{90/90 точки}. От PC е изпълнен успешен ping към \texttt{209.165.200.2} с 4 изпратени и 4 получени пакета, без загуба, с RTT 10/16/19 ms. Ping от Laptop не е проверен в тази сесия и не се представя като изпълнен тест.
+
+\section{Изводи и приложени файлове}
+Основната задача е завършена с 100/100 точки. VLAN 25 разполага с 62 използваеми IPv4 адреса и покрива изискването за 50 хоста. Статичният trunk и подинтерфейсите на R2 осигуряват маршрутизация между VLAN, а PPP с CHAP и маршрутите към доставчика позволяват достъп до Web. От PC15 и PC25 е потвърдена IPv4 и IPv6 свързаност без загуба в крайните проверки.
+
+В папката \texttt{cisco/} са включени двата записани PKA файла. Папката \texttt{evidence/} съдържа текстов запис на наблюдаваните резултати, а \texttt{configs/} -- приложените конфигурационни команди. Командните файлове описват направените промени, а не пълен export на всички предварително зададени настройки. Протоколът е оформен по предоставения образец за заглавна страница, шрифт, междуредие, полета и номерация.
+
+\begin{thebibliography}{9}
+\bibitem{activity} Cisco Networking Academy. Packet Tracer -- Skills Integration Challenge. Условия и вградено оценяване в приложения PKA файл, изпълнение на 26.10.2026 г.
+\bibitem{pap} Cisco Networking Academy. Packet Tracer -- Configuring PAP and CHAP Authentication. Приложен PKA файл.
+\bibitem{template} Алекс Цветанов. Отдалечен директен достъп до паметта (RDMA) и управление на потоците в TCP/IP мрежи. Образец за оформление. \url{https://github.com/Alex-Tsvetanov/mcse05-rdma-coursework/blob/main/main.pdf}.
+\end{thebibliography}
+\end{document}

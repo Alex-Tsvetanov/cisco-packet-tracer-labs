@@ -1,0 +1,22 @@
+! Applied changes, not full running-config
+configure terminal
+ipv6 unicast-routing
+username R2 password cisco
+interface s0/0/0
+ encapsulation ppp
+ ppp authentication chap
+exit
+ip route 0.0.0.0 0.0.0.0 s0/0/1
+ipv6 route ::/0 s0/0/1
+router ospf 1
+ router-id 1.1.1.1
+ network 10.1.1.0 0.0.0.3 area 0
+ default-information originate
+exit
+ipv6 router ospf 1
+ router-id 1.1.1.1
+exit
+interface s0/0/0
+ ipv6 ospf 1 area 0
+end
+write memory
