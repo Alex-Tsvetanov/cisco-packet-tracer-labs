@@ -7,7 +7,7 @@
 - `report.tex` / `report.pdf`: общ лабораторен протокол на български за двете задачи от Упражнение 1.
 - `cisco/Packet Tracer - Skills Integration Challenge.pka`: завършена основна задача, **100/100**.
 - `cisco/Packet Tracer - Configuring PAP and CHAP Authentication.pka`: предходната задача, **90/90**.
-- `cisco/Packet Tracer - Troubleshooting PPP with Authentication.pka`: завършена диагностична задача, **100/100**. Началният вариант е запазен като `Packet Tracer - Troubleshooting PPP with Authentication -- initial.pka`.
+- `cisco/Packet Tracer - Troubleshooting PPP with Authentication.pka`: завършена диагностична задача, **100/100**.
 - `configs/troubleshooting/`: корекциите по R1, R2 и R3 в диагностичната задача.
 - `evidence/troubleshooting-results.txt`: резултатите от нея, включително ping и traceroute.
 - `configs/`: приложените команди за основната задача; това не са пълни running-config exports.
