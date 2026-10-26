@@ -1,0 +1,23 @@
+! Applied repairs, not full running-config
+configure terminal
+no username R11
+username R1 password cisco
+username R3 password cisco
+interface g0/1
+ ip address 209.165.200.161 255.255.255.224
+interface s0/0/0
+ no shutdown
+interface s0/0/1
+ encapsulation ppp
+ ppp authentication chap
+ no shutdown
+end
+write memory
+clear ip ospf process
+yes
+configure terminal
+router ospf 1
+ no default-information originate
+ default-information originate
+end
+write memory

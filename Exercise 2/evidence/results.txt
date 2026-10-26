@@ -1,0 +1,27 @@
+Transcription of visible Packet Tracer UI output, 2026-10-26.
+Activity: Troubleshooting PPP with Authentication
+Initial Completion: 0/100
+Final Completion: 100/100
+Overall Feedback: Congratulations! You successfully completed the Packet Tracer - Troubleshooting PPP with Authentication activity.
+
+Final ping to 209.165.200.2, 32 bytes, TTL 125:
+PC1: 4 sent,4 received,0 lost; min/avg/max=2/32/64ms; replies=32,64,30,2ms
+PC3: 4 sent,4 received,0 lost; min/avg/max=40/57/70ms; replies=40,70,65,55ms
+Earlier after OSPF refresh: both PCs 3/4; before refresh both 0/4 unreachable from respective LAN gateway.
+
+PC1 tracert:
+1 0 0 0ms 10.0.0.1
+2 28 22 0ms 172.16.0.2
+3 10 30 9ms 209.165.200.162
+4 11 5 0ms 209.165.200.2
+Trace complete.
+
+PC3 tracert:
+1 0 0 0ms 10.0.0.129
+2 10 5 8ms 172.16.0.5
+3 5 0 9ms 209.165.200.162
+4 0 0 9ms 209.165.200.2
+Trace complete.
+
+R3 interfaces G0/1,S0/0/0,S0/0/1 up/up. OSPF neighbors FULL:10.0.0.1 via172.16.0.9 and209.165.200.161 via172.16.0.5.
+R2 clear ip ospf process restored neighbors but did not alone restore PC reachability; toggling default-information originate did.

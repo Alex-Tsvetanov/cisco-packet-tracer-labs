@@ -1,0 +1,16 @@
+! Applied repairs, not full running-config
+configure terminal
+username R2 password cisco
+interface g0/1
+ ip address 10.0.0.129 255.255.255.128
+ no shutdown
+interface s0/0/0
+ encapsulation ppp
+ ppp authentication chap
+ no shutdown
+interface s0/0/1
+ ip address 172.16.0.6 255.255.255.252
+ ppp authentication chap
+ no shutdown
+end
+write memory
