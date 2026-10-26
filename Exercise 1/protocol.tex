@@ -63,6 +63,8 @@
 \renewcommand{\cftsecpagefont}{\fontsize{12}{14}\bfseries}
 \renewcommand{\cftsecaftersnum}{.}
 \renewcommand{\cftsubsecaftersnum}{.}
+\setlength{\cftsubsecnumwidth}{3em}
+\setlength{\cftsecnumwidth}{3em}
 
 % --- Captions ---
 \usepackage{caption}
@@ -87,6 +89,7 @@
 \usepackage{array}
 \usepackage[hidelinks]{hyperref}
 
+\AtBeginEnvironment{lstlisting}{\setstretch{1}}
 \begin{document}
 \hypersetup{pageanchor=false}
 \begin{titlepage}
@@ -122,6 +125,11 @@
 \clearpage
 \pagenumbering{arabic}
 
+\section*{Обхват на упражнението}
+\addcontentsline{toc}{section}{Обхват на упражнението}
+Упражнение 1 обединява задачите „Skills Integration Challenge“ и „Troubleshooting PPP with Authentication“. За всяка задача са представени отделно топологията, настройките и измерените резултати. Запазени са и резултатите от подготвителната задача „Configuring PAP and CHAP Authentication“.
+
+\part{Skills Integration Challenge}
 \section{Цел и постановка}
 Целта на упражнението е да се осигури свързаност между локални VLAN мрежи и отдалечен уеб сървър чрез конфигуриране на междумрежова маршрутизация, PPP с CHAP, OSPF за IPv4 и IPv6 и маршрути по подразбиране. Основната задача е „Packet Tracer -- Skills Integration Challenge“. Към протокола е приложена и изпълнената предходна задача „Configuring PAP and CHAP Authentication“.
 
@@ -130,11 +138,13 @@
 В началното състояние основната задача отчита 2/100 точки. Предварително са зададени серийните адреси на R1 и R2, част от IPv6 адресите, адресите на PC15 и управленският адрес на S1. Интерфейсът G0/0 на R2 е административно изключен, а VLAN маршрутизацията, OSPF и PPP удостоверяването не са завършени.
 
 \section{Топология и адресен план}
+\Needspace{8\baselineskip}
 \subsection{Мрежова топология}
 PC15 е свързан към F0/7 на S1 във VLAN 15. PC25 и принтерът L25 са свързани съответно към F0/19 и F0/20 във VLAN 25. Връзката S1 F0/1 -- R2 G0/0 е trunk с native VLAN 99. R2 маршрутизира между VLAN мрежите чрез подинтерфейси на G0/0.
 
 R2 S0/0/0 е свързан с R1 S0/0/0. R1 достига доставчика през S0/0/1, а зад доставчика се намира сървърът Web. Адресите на сървъра са \texttt{209.165.201.2} и \texttt{2001:DB8:B:2::2}.
 
+\Needspace{8\baselineskip}
 \subsection{Изчисляване на подмрежата за VLAN 25}
 За 50 хоста са необходими шест бита за хостовата част, тъй като $2^6-2=62\geq50$, а $2^5-2=30<50$. Следователно префиксът е /26, а маската е 255.255.255.192. Между VLAN 15 и VLAN 1 остава блокът 192.168.1.128--192.168.1.191.
 
@@ -155,6 +165,7 @@ VLAN & Мрежа & Маска & Нужни хостове & Капацитет\
 \end{tabular}
 \end{table}
 
+\Needspace{8\baselineskip}
 \subsection{Адреси на устройствата}
 \begin{longtable}{p{3.5cm}p{4cm}p{7cm}}
 \caption{IPv4 и IPv6 адреси в основната задача}\\
@@ -178,6 +189,7 @@ Web & 209.165.201.2 & \texttt{2001:DB8:B:2::2/64}\\
 Link-local адресът на R1 е \texttt{FE80::1}, а на интерфейсите на R2 -- \texttt{FE80::2}. IPv4 шлюзовете на PC15 и VLAN 25 са съответно 192.168.1.1 и 192.168.1.129. IPv6 шлюзът на трите крайни устройства е \texttt{FE80::2}. S1 използва IPv4 шлюз 192.168.1.225.
 
 \section{Изпълнение}
+\Needspace{8\baselineskip}
 \subsection{VLAN и trunk на S1}
 Създадени са VLAN 15, 25, 99 и VLAN 86 с име \texttt{BlackHole}. F0/1 е конфигуриран като статичен trunk с native VLAN 99. Портовете F0/7--F0/18 са статични access портове във VLAN 15, а F0/19--F0/24 -- във VLAN 25. Неизползваните F0/2--F0/6 и G0/1--G0/2 са преместени във VLAN 86 и административно изключени.
 \Needspace{22\baselineskip}
@@ -203,6 +215,7 @@ interface range g0/1-2
  shutdown
 \end{lstlisting}
 
+\Needspace{8\baselineskip}
 \subsection{Маршрутизация между VLAN на R2}
 Физическият интерфейс G0/0 е включен с \texttt{no shutdown}. На подинтерфейсите са зададени 802.1Q VLAN идентификаторите и съответните IPv4 адреси. За G0/0.99 е използвана командата \texttt{encapsulation dot1Q 99 native}. Създаден е G0/0.25 и е зададен адресният план за VLAN 25:
 \Needspace{8\baselineskip}
@@ -215,6 +228,7 @@ interface g0/0.25
 \end{lstlisting}
 На PC25 са зададени 192.168.1.130, маска 255.255.255.192 и шлюз 192.168.1.129. На L25 са зададени 192.168.1.190 и същата маска. Неговият предварително зададен шлюз 192.168.1.129 е запазен. Предварително зададените IPv6 адреси на крайните устройства са проверени.
 
+\Needspace{8\baselineskip}
 \subsection{PPP с CHAP между R1 и R2}
 На двата края на S0/0/0 е зададена PPP капсулация и CHAP удостоверяване. Потребителското име на всеки маршрутизатор съвпада с hostname на отсрещния, а общата парола по условие е \texttt{cisco}.
 \Needspace{13\baselineskip}
@@ -231,6 +245,7 @@ interface s0/0/0
  ppp authentication chap
 \end{lstlisting}
 
+\Needspace{8\baselineskip}
 \subsection{Статични маршрути и OSPF}
 На R1 са създадени IPv4 и IPv6 маршрути по подразбиране през S0/0/1 към доставчика. На R2 е създаден IPv6 маршрут по подразбиране през S0/0/0 към R1. IPv4 маршрутът по подразбиране се разпространява от R1 чрез OSPF.
 \Needspace{19\baselineskip}
@@ -255,9 +270,11 @@ router ospf 1
 За IPv6 на двата маршрутизатора е включено \texttt{ipv6 unicast-routing}. OSPFv3 използва процес 1 и област 0, с router ID 1.1.1.1 за R1 и 2.2.2.2 за R2. Активиран е на общия сериен линк и на подинтерфейсите G0/0.1, G0/0.15, G0/0.25 и G0/0.99 на R2 чрез \texttt{ipv6 ospf 1 area 0}. Конфигурациите на R1, R2 и S1 са записани с \texttt{write memory}.
 
 \section{Проверки и резултати}
+\Needspace{8\baselineskip}
 \subsection{Оценяване на конфигурацията}
 След изпълнението PT Activity показва \textbf{100/100 точки}. В Check Results е изведено съобщение за успешно завършване на „Skills Integration Challenge“. Проверените видими елементи в Assessment Items, включително CHAP, IPv6 маршрутизацията, маршрута по подразбиране и OSPF, са означени като \texttt{Correct}.
 
+\Needspace{8\baselineskip}
 \subsection{Свързаност на крайните устройства}
 От PC15 и PC25 са изпълнени \texttt{ping 209.165.201.2} и \texttt{ping 2001:DB8:B:2::2}. Таблица~\ref{tab:ping} съдържа завършените проверки. Времената са минимално/средно/максимално RTT според изхода на Packet Tracer.
 \begin{table}[H]
@@ -278,6 +295,7 @@ PC25 & IPv6 & 4/4 & 0\% & 14/17/20\\
 \end{table}
 При първия IPv4 тест от PC15 има един timeout. Повторният тест е успешен без загуба. Самият изход от ping не установява еднозначно причината за първия timeout; не е правено отделно проследяване на ARP и протоколната сходимост.
 
+\Needspace{8\baselineskip}
 \subsection{ICMP проверки от L25 и мрежовите устройства}
 Чрез Add Simple PDU са изпратени ICMP пакети към Web от L25, R1, R2 и S1. L25, R1 и R2 показват \texttt{Successful}. Първият пакет от S1 е \texttt{Failed}, а двата повторни -- \texttt{Successful}. За L25 е използван PDU тест, тъй като устройството е принтер и няма PC команден прозорец.
 
@@ -288,13 +306,174 @@ PC25 & IPv6 & 4/4 & 0\% & 14/17/20\\
 
 Потвърденият резултат е \textbf{90/90 точки}. От PC е изпълнен успешен ping към \texttt{209.165.200.2} с 4 изпратени и 4 получени пакета, без загуба, с RTT 10/16/19 ms. Ping от Laptop не е проверен в тази сесия и не се представя като изпълнен тест.
 
-\section{Изводи и приложени файлове}
-Основната задача е завършена с 100/100 точки. VLAN 25 разполага с 62 използваеми IPv4 адреса и покрива изискването за 50 хоста. Статичният trunk и подинтерфейсите на R2 осигуряват маршрутизация между VLAN, а PPP с CHAP и маршрутите към доставчика позволяват достъп до Web. От PC15 и PC25 е потвърдена IPv4 и IPv6 свързаност без загуба в крайните проверки.
 
-В папката \texttt{cisco/} са включени двата записани PKA файла. Папката \texttt{evidence/} съдържа текстов запис на наблюдаваните резултати, а \texttt{configs/} -- приложените конфигурационни команди. Командните файлове описват направените промени, а не пълен export на всички предварително зададени настройки. Протоколът е оформен по предоставения образец за заглавна страница, шрифт, междуредие, полета и номерация.
+\clearpage
+\part{Troubleshooting PPP with Authentication}
+\section{Цел и постановка}
+Задачата „Packet Tracer -- Troubleshooting PPP with Authentication“ изисква възстановяване на свързаността между три маршрутизатора, две локални мрежи и външен уеб сървър. Диагностиката обхваща физическото, каналното и мрежовото ниво. Всички серийни връзки трябва да използват PPP и CHAP с парола \texttt{cisco}.
 
+Упражнението е изпълнено в Cisco Packet Tracer 9.0.1. Началната оценка е 0/100, а след корекциите автоматичната проверка отчита \textbf{100/100}. Допълнително са изпълнени проверки с \texttt{ping} и \texttt{tracert} от крайните станции.
+
+\section{Топология и адресиране}
+Маршрутизаторите R1, R2 и R3 са свързани в триъгълник. PC1 достига R1 през S1, а PC3 достига R3 през S3. R2 е свързан с ISP, зад който се намира Web Server.
+
+\begin{center}\small
+\begin{longtable}{llll}
+\toprule Устройство & Интерфейс & IPv4 адрес & Маска \\\midrule
+R1 & G0/1 & 10.0.0.1 & /25 \\
+R1 & S0/0/0 & 172.16.0.1 & /30 \\
+R1 & S0/0/1 & 172.16.0.9 & /30 \\
+R2 & G0/1 & 209.165.200.161 & /27 \\
+R2 & S0/0/0 & 172.16.0.2 & /30 \\
+R2 & S0/0/1 & 172.16.0.5 & /30 \\
+R3 & G0/1 & 10.0.0.129 & /25 \\
+R3 & S0/0/0 & 172.16.0.10 & /30 \\
+R3 & S0/0/1 & 172.16.0.6 & /30 \\
+ISP & G0/1 & 209.165.200.162 & /27 \\
+PC1 & NIC & 10.0.0.10 & /25 \\
+PC3 & NIC & 10.0.0.139 & /25 \\
+Web Server & NIC & 209.165.200.2 & /30 \\\bottomrule
+\end{longtable}\end{center}
+Шлюзовете на PC1, PC3 и Web Server са съответно 10.0.0.1, 10.0.0.129 и 209.165.200.1. Маските /25, /27 и /30 съответстват на 255.255.255.128, 255.255.255.224 и 255.255.255.252.
+
+\section{Диагностика и установени грешки}
+\Needspace{8\baselineskip}
+\subsection{Физическо ниво}
+Проверени са портовете на кабелите и административното състояние на интерфейсите. Кабелните връзки съответстват на топологията и не се налага преместване. LAN кабелът на R1 е включен в G0/1, въпреки че първоначално адресът е зададен на изключения G0/0.
+
+DCE краищата са R1 S0/0/0, R2 S0/0/1 и R3 S0/0/0. Наличните тактови честоти са съответно 64000, 2000000 и 64000 bit/s. Те са запазени. Неактивните необходими интерфейси са включени с \texttt{no shutdown}.
+
+\Needspace{8\baselineskip}
+\subsection{Канално ниво и CHAP}
+В началната конфигурация част от серийните портове използват HDLC, а други PPP с PAP. На всички шест серийни интерфейса е осигурено \texttt{encapsulation ppp} и \texttt{ppp authentication chap}. Съществуващите правилни настройки са запазени.
+
+На R1 липсва потребител R3; на R3 липсва R2. На R2 е въведено грешно име R11 вместо R1, а паролата за R3 е \texttt{class}. Записите са поправени така, че всеки маршрутизатор разполага с имената на двата си непосредствени съседи и общата парола \texttt{cisco}.
+
+\Needspace{8\baselineskip}
+\subsection{Мрежово ниво}
+На R1 адресът 10.0.0.1/25 е преместен от G0/0 на G0/1. Маската на S0/0/0 е коригирана от /29 на /30. На R2 е добавен липсващият адрес 209.165.200.161/27 на G0/1. На R3 маската на G0/1 е променена от /24 на /25, а на S0/0/1 е зададен липсващият адрес 172.16.0.6/30.
+
+След възстановяването на интерфейсите OSPF съседствата достигат състояние FULL. Първите проверки към сървъра обаче връщат „Destination host unreachable“ от LAN шлюзовете. В R1 и R3 липсва маршрут по подразбиране, въпреки наличните статичен маршрут и \texttt{default-information originate} в R2. В OSPF базата е наблюдавана външна обява за 0.0.0.0 с Advertising Router 0.0.0.0.
+
+Рестартирането на OSPF процеса в R2 възстановява съседствата, но само по себе си не решава проблема. Премахването и повторното задаване на \texttt{default-information originate} обновява обявата. След тази операция крайните станции достигат сървъра. Това е допълнителна проверка на работата на мрежата извън автоматичната оценка.
+
+\section{Приложени команди}
+Следващите списъци съдържат приложените корекции, а не пълни конфигурации. Конфигурациите са записани с \texttt{write memory}.
+\Needspace{8\baselineskip}
+\subsection{R1}
+\begin{lstlisting}
+configure terminal
+username R3 password cisco
+interface g0/0
+ no ip address
+interface g0/1
+ ip address 10.0.0.1 255.255.255.128
+ no shutdown
+interface s0/0/0
+ ip address 172.16.0.1 255.255.255.252
+ encapsulation ppp
+ ppp authentication chap
+ no shutdown
+interface s0/0/1
+ ppp authentication chap
+ no shutdown
+end
+write memory
+\end{lstlisting}
+\Needspace{8\baselineskip}
+\subsection{R2}
+\begin{lstlisting}
+configure terminal
+no username R11
+username R1 password cisco
+username R3 password cisco
+interface g0/1
+ ip address 209.165.200.161 255.255.255.224
+interface s0/0/0
+ no shutdown
+interface s0/0/1
+ encapsulation ppp
+ ppp authentication chap
+ no shutdown
+end
+write memory
+clear ip ospf process
+yes
+configure terminal
+router ospf 1
+ no default-information originate
+ default-information originate
+end
+write memory
+\end{lstlisting}
+\Needspace{8\baselineskip}
+\subsection{R3}
+\begin{lstlisting}
+configure terminal
+username R2 password cisco
+interface g0/1
+ ip address 10.0.0.129 255.255.255.128
+ no shutdown
+interface s0/0/0
+ encapsulation ppp
+ ppp authentication chap
+ no shutdown
+interface s0/0/1
+ ip address 172.16.0.6 255.255.255.252
+ ppp authentication chap
+ no shutdown
+end
+write memory
+\end{lstlisting}
+
+\section{Проверки и резултати}
+Автоматичната проверка отчита \textbf{Completion: 100/100} и съобщение за успешно завършване на упражнението. Серийните връзки са активни. На R3 са наблюдавани G0/1, S0/0/0 и S0/0/1 в състояние \texttt{up/up} и две OSPF съседства в състояние FULL.
+
+Първото изпълнение на ping след обновяването на OSPF обявата дава по три отговора от четири и на двата компютъра. Повторните проверки приключват без загуби:
+\begin{center}
+\begin{tabular}{lrrrr}
+\toprule Източник & Получени & Загуби & min/avg/max, ms \\\midrule
+PC1 & 4/4 & 0\% & 2/32/64 \\
+PC3 & 4/4 & 0\% & 40/57/70 \\\bottomrule
+\end{tabular}
+\end{center}
+И при двата теста целта е 209.165.200.2, полезният товар е 32 bytes, а полученият TTL е 125. Стойностите са измервания в симулатора.
+
+\Needspace{8\baselineskip}
+\subsection{Проследяване от PC1}
+\begin{lstlisting}
+C:\>tracert 209.165.200.2
+1   0 ms    0 ms    0 ms    10.0.0.1
+2  28 ms   22 ms    0 ms    172.16.0.2
+3  10 ms   30 ms    9 ms    209.165.200.162
+4  11 ms    5 ms    0 ms    209.165.200.2
+Trace complete.
+\end{lstlisting}
+Пътят преминава през R1, R2 и ISP и достига сървъра за четири стъпки.
+
+\Needspace{8\baselineskip}
+\subsection{Проследяване от PC3}
+\begin{lstlisting}
+C:\>tracert 209.165.200.2
+1   0 ms    0 ms    0 ms    10.0.0.129
+2  10 ms    5 ms    8 ms    172.16.0.5
+3   5 ms    0 ms    9 ms    209.165.200.162
+4   0 ms    0 ms    9 ms    209.165.200.2
+Trace complete.
+\end{lstlisting}
+Пътят преминава през R3, R2 и ISP. Двата успешни теста потвърждават достижимостта на външния сървър от двете локални мрежи.
+
+
+\Needspace{12\baselineskip}
+\section{Общи изводи и приложени файлове}
+Двете задачи от Упражнение 1 са завършени с по 100/100 точки. В първата е потвърдена IPv4 и IPv6 свързаността от PC15 и PC25 към Web. Във втората са отстранени грешките в PPP/CHAP и адресирането, обновена е OSPF обявата за маршрута по подразбиране и са изпълнени успешни ping и traceroute проверки от PC1 и PC3. Подготвителната задача за PAP и CHAP е оценена с 90/90 точки.
+
+Всички PKA файлове са в \texttt{cisco/}. Началният файл за диагностичната задача е запазен с окончание \texttt{-- initial.pka}. Командите и резултатите за първата задача са в \texttt{configs/} и \texttt{evidence/results.txt}, а за втората -- в \texttt{configs/troubleshooting/} и \texttt{evidence/troubleshooting-results.txt}. Командните файлове описват приложените промени, а не пълни експорти на конфигурациите.
+
+\Needspace{12\baselineskip}
 \begin{thebibliography}{9}
-\bibitem{activity} Cisco Networking Academy. Packet Tracer -- Skills Integration Challenge. Условия и вградено оценяване в приложения PKA файл, изпълнение на 26.10.2026 г.
+\bibitem{activity} Cisco Networking Academy. Packet Tracer -- Skills Integration Challenge. Условия и вградено оценяване в приложения PKA файл.
+\bibitem{troubleshooting} Cisco Networking Academy. Packet Tracer -- Troubleshooting PPP with Authentication. Условия и вградено оценяване в приложения PKA файл.
 \bibitem{pap} Cisco Networking Academy. Packet Tracer -- Configuring PAP and CHAP Authentication. Приложен PKA файл.
 \end{thebibliography}
 \end{document}
