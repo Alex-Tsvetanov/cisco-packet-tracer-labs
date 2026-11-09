@@ -1,0 +1,19 @@
+Transcription of visible Cisco Packet Tracer UI output, 2026-11-09.
+Activity: Configuring GRE
+Initial completion:0/100
+Final completion:100/100;12/12items;GRE10/10=90/90points;IPv4staticroutes2/2=10/10points.
+RA initial G0/0=192.168.1.1up/up,S0/0/0=64.103.211.2up/up,default route exitsS0/0/0.
+After RA configured,before RB configured:
+RB ping64.103.211.2:5/5,RTT19/25/30ms.
+PCB ping192.168.1.2:0/4,timeouts.
+After both configured:
+RA show interfaces tunnel0:up/up,10.10.10.1/30,source64.103.211.2(S0/0/0),destination209.165.122.2,GRE/IP.
+RB Tunnel0=10.10.10.2up/up;C10.10.10.0/30Tunnel0;S192.168.1.0/24[1/0]via10.10.10.1.
+RB ping10.10.10.1:5/5,RTT24/27/35ms.
+PCB ping192.168.1.2:first3/4,RTT20/28/36ms;repeat4/4,RTT27/29/33ms,TTL126,32bytes.
+PCA tracert192.168.2.2:
+1 0 0 0ms192.168.1.1
+2 26 11 27ms10.10.10.2
+3 31 25 26ms192.168.2.2
+Trace complete.
+Both router write memory:[OK].

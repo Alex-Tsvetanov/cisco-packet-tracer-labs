@@ -1,0 +1,221 @@
+\documentclass[12pt]{article}
+
+% Preamble and title page follow the TU-Sofia thesis template (Bulgarian layout,
+% same faculty heading and typography).
+
+\usepackage{cmap}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[bulgarian]{babel}
+
+% --- Typography ---
+\usepackage{tempora}
+\usepackage[top=2.5cm, bottom=2.5cm, left=3.0cm, right=2.0cm, a4paper]{geometry}
+\usepackage{setspace}
+\setstretch{1.5}
+\usepackage[none]{hyphenat}
+\usepackage[expansion=false]{microtype}
+\emergencystretch=1.5em
+\sloppy
+\usepackage{indentfirst}
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0pt}
+
+% --- Page numbering (bottom right) ---
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[R]{\thepage}
+
+% --- Footnotes ---
+\usepackage[hang,flushmargin]{footmisc}
+\usepackage{ragged2e}
+\renewcommand{\footnotelayout}{\fontsize{10}{12}\selectfont\setstretch{1.0}\justifying}
+
+% --- Sections ---
+\usepackage{titlesec}
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+
+\titleformat{\section}[block]
+  {\fontsize{14}{16.8}\bfseries\centering}
+  {\thesection. }
+  {0pt}
+  {\MakeUppercase}
+
+\titleformat{\subsection}[block]
+  {\fontsize{14}{16.8}\bfseries}
+  {\thesubsection. }
+  {0pt}
+  {}
+\titlespacing*{\subsection}{1.25cm}{*3}{*2}
+
+% --- Table of contents ---
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\l@section}{#1}{\MakeUppercase{#1}}{}{}
+\makeatother
+\usepackage[titles]{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsubsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsecfont}{\fontsize{12}{14}\bfseries}
+\renewcommand{\cftsecpagefont}{\fontsize{12}{14}\bfseries}
+\renewcommand{\cftsecaftersnum}{.}
+\renewcommand{\cftsubsecaftersnum}{.}
+\setlength{\cftsubsecnumwidth}{3em}
+\setlength{\cftsecnumwidth}{3em}
+
+% --- Captions ---
+\usepackage{caption}
+\addto\captionsbulgarian{\renewcommand{\figurename}{Фигура}}
+\DeclareCaptionLabelFormat{tablelabel}{Таблица #2}
+\captionsetup[table]{
+    labelformat=tablelabel,
+    labelsep=period,
+    font={bf,small},
+    justification=centering,
+    singlelinecheck=true
+}
+
+% --- Other ---
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{needspace}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,columns=fullflexible,keepspaces=true,frame=single}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[hidelinks]{hyperref}
+
+\AtBeginEnvironment{lstlisting}{\setstretch{1}}
+\begin{document}
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+\begin{center}
+{\fontsize{18}{21.6}\selectfont\bfseries ТЕХНИЧЕСКИ УНИВЕРСИТЕТ -- СОФИЯ\par}
+\vspace{0.5cm}
+{\fontsize{16}{19.2}\selectfont\bfseries ФАКУЛТЕТ „КОМПЮТЪРНИ СИСТЕМИ И ТЕХНОЛОГИИ“\par}
+\vspace{0.6cm}
+\includegraphics[width=0.28\linewidth]{images/tu_logo.png}
+\vspace{0.8cm}
+
+{\fontsize{20}{24}\selectfont\bfseries КОНФИГУРИРАНЕ НА GRE ТУНЕЛ\par}
+\vspace{0.8cm}
+{\fontsize{14}{16.8}\selectfont\bfseries ЛАБОРАТОРЕН ПРОТОКОЛ\par}
+\vspace{0.3cm}
+{\fontsize{13}{15.6}\selectfont Упражнение 2\par Cisco Packet Tracer\par}
+\vfill
+\begin{flushleft}
+{\fontsize{14}{16.8}\selectfont\bfseries Изготвил:\par}
+Алекс Цветанов\par
+Факултетен № 371326005\par
+\vspace{0.5cm}
+{\fontsize{14}{16.8}\selectfont\bfseries Преподавател:\par}
+д-р Йонка Ганчева\par
+\end{flushleft}
+\vfill
+София, 9 ноември 2026 г.
+\end{center}
+\end{titlepage}
+\hypersetup{pageanchor=true}
+\pagenumbering{roman}
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+
+\section{Цел и постановка}
+Задачата „Packet Tracer -- Configuring GRE“ изисква свързване на две предварително конфигурирани локални мрежи през GRE тунел между маршрутизаторите RA и RB. Последователността включва проверка на свързаността между публичните интерфейси, създаване на Tunnel0, добавяне на статични маршрути към отдалечените LAN мрежи и крайни проверки с ping и traceroute.
+
+\section{Топология и адресен план}
+PCA е свързан през SA към RA, а PCB -- през SB към RB. Серийните интерфейси на двата маршрутизатора достигат предварително конфигурираната транзитна мрежа, означена като Internet. Логическата връзка Tunnel0 използва мрежата 10.10.10.0/30.
+
+\begin{table}[H]
+\centering\small
+\caption{Адреси по условието на задачата}
+\begin{tabular}{llll}
+\toprule Устройство & Интерфейс & IPv4 адрес & Маска \\\midrule
+RA & G0/0 & 192.168.1.1 & /24 \\
+RA & S0/0/0 & 64.103.211.2 & /30 \\
+RA & Tunnel0 & 10.10.10.1 & /30 \\
+RB & G0/0 & 192.168.2.1 & /24 \\
+RB & S0/0/0 & 209.165.122.2 & /30 \\
+RB & Tunnel0 & 10.10.10.2 & /30 \\
+PCA & NIC & 192.168.1.2 & /24 \\
+PCB & NIC & 192.168.2.2 & /24 \\\bottomrule
+\end{tabular}
+\end{table}
+Шлюзовете на PCA и PCB са съответно 192.168.1.1 и 192.168.2.1. Маските /24 и /30 са 255.255.255.0 и 255.255.255.252.
+
+
+
+\begin{figure}[H]
+\centering\includegraphics[width=0.95\linewidth]{images/topology.png}
+\caption{Топология на задачата с двете LAN мрежи и предвидения GRE тунел.}
+\end{figure}
+\section{Начални проверки}
+Началната оценка на PT Activity е 0/100. На RA командата \texttt{show ip interface brief} показва G0/0 с адрес 192.168.1.1 и S0/0/0 с адрес 64.103.211.2 в състояние up/up. Налице е предварително зададен маршрут по подразбиране през S0/0/0.
+
+Преди конфигурирането на RB е изпълнен \texttt{ping 64.103.211.2} от RB към публичния интерфейс на RA: 5/5 успешни отговора, RTT 19/25/30 ms. Това потвърждава свързаността през транзитната мрежа. В този момент RA вече е конфигуриран, но тунелът и маршрутът в RB още липсват. Ping от PCB към PCA тогава е неуспешен: 0/4 отговора.
+
+\section{Конфигуриране на тунела}
+На всеки маршрутизатор е създаден Tunnel0 с адрес от 10.10.10.0/30. Източникът е локалният сериен интерфейс S0/0/0, а крайната точка е публичният адрес на отсрещния маршрутизатор. Зададени са режим GRE/IP и \texttt{no shutdown}. Статичният маршрут към отдалечената LAN използва адреса на отсрещния Tunnel0 като следващ скок.
+\Needspace{14\baselineskip}
+\subsection{Команди на RA}
+\lstinputlisting{configs/RA.commands}
+\Needspace{14\baselineskip}
+\subsection{Команди на RB}
+\lstinputlisting{configs/RB.commands}
+Конфигурациите са записани с \texttt{write memory}; и двата маршрутизатора връщат \texttt{[OK]}. Предварително зададените LAN и WAN адреси са запазени.
+
+\section{Проверки след конфигурирането}
+На RA \texttt{show interfaces tunnel 0} показва Tunnel0 up/up, адрес 10.10.10.1/30, източник 64.103.211.2, крайна точка 209.165.122.2 и \texttt{Tunnel protocol/transport GRE/IP}. На RB \texttt{show ip interface brief} също показва Tunnel0 up/up, с адрес 10.10.10.2.
+
+В маршрутната таблица на RB се появяват директно свързаната мрежа 10.10.10.0/30 през Tunnel0 и статичният маршрут 192.168.1.0/24 през 10.10.10.1. Ping от RB към 10.10.10.1 завършва с 5/5 отговора и RTT 24/27/35 ms.
+\begin{figure}[H]
+\centering\includegraphics[width=0.95\linewidth]{images/rb-routing.png}
+\caption{Състояние на интерфейсите, маршрутна таблица на RB и успешен ping през тунела.}
+\end{figure}
+
+\subsection{Свързаност между крайните устройства}
+Първият ping от PCB към 192.168.1.2 след завършването на тунела е с 3/4 отговора и RTT 20/28/36 ms. Повторният тест е с 4/4 отговора, без загуби, RTT 27/29/33 ms и TTL 126. Полезният товар е 32 bytes. Времената са измерени в Packet Tracer и не описват производителността на физическа мрежа.
+\begin{figure}[H]
+\centering\includegraphics[width=0.9\linewidth]{images/pcb-ping.png}
+\caption{Повторен успешен ping от PCB към PCA -- 4/4 отговора.}
+\end{figure}
+
+
+
+\subsection{Проследяване на пътя от PCA към PCB}
+Командата \texttt{tracert 192.168.2.2} завършва успешно за три стъпки:
+\begin{lstlisting}
+1   0 ms    0 ms    0 ms    192.168.1.1
+2  26 ms   11 ms   27 ms    10.10.10.2
+3  31 ms   25 ms   26 ms    192.168.2.2
+Trace complete.
+\end{lstlisting}
+В изхода се виждат LAN адресът на RA, тунелният адрес на RB и адресът на PCB. Публичните адреси на транзитната мрежа не се показват като отделни стъпки.
+\begin{figure}[H]
+\centering\includegraphics[width=0.95\linewidth]{images/pca-trace.png}
+\caption{Проследяване от PCA към PCB през GRE тунела.}
+\end{figure}
+
+\Needspace{12\baselineskip}
+\subsection{Автоматично оценяване}
+PT Activity отчита \textbf{100/100 точки}. В Assessment Items са изпълнени 12/12 елемента: 10/10 за GRE конфигурациите, оценени с 90/90 точки, и 2/2 за IPv4 статичните маршрути, оценени с 10/10 точки.
+\begin{figure}[H]
+\centering\includegraphics[width=0.95\linewidth]{images/score.png}
+\caption{Оценка 100/100 за GRE тунела и статичната маршрутизация.}
+\end{figure}
+
+\section{Заключение}
+Създаден е работещ GRE тунел между RA и RB. Двете частни мрежи обменят трафик чрез статични маршрути към тунелните адреси. Крайният ping от PCB към PCA е без загуби, а traceroute от PCA към PCB показва три стъпки, без публичните транзитни адреси. Автоматичната проверка потвърждава изпълнението с 100/100 точки.
+
+В папката \texttt{cisco/} е записан завършеният файл \texttt{Configuring GRE.pka}. Папките \texttt{configs/}, \texttt{evidence/} и \texttt{images/} съдържат приложените команди, текстов препис на резултатите и екранните снимки. Командните файлове съдържат направените настройки, а не пълни running-config конфигурации.
+
+\begin{thebibliography}{9}
+\bibitem{activity} Cisco Networking Academy. Packet Tracer -- Configuring GRE. Условия, адресна таблица и вградено оценяване в приложения PKA файл. Изпълнение на 09.11.2026 г.
+\end{thebibliography}
+\end{document}
