@@ -1,0 +1,16 @@
+Troubleshooting GRE — 18.11.2026
+Initial completion: 0/100
+RA faults: Tunnel0 172.31.0.1/24; G0/0 192.168.1.1/30; route 172.31.1.0/24 via 64.103.211.2.
+RB faults: tunnel source G0/0; destination 192.168.1.1.
+RB public ping 209.165.122.2 before repairs: 5/5, RTT 19/25/30 ms.
+RA and RB write memory: [OK].
+RA G0/0 172.31.0.1, S0/0/0 209.165.122.2, Tunnel0 192.168.1.1: up/up.
+RA route 172.31.1.0/24 via 192.168.1.2.
+RA ping tunnel peer 192.168.1.2: 5/5, RTT 15/21/27 ms.
+PCB ping PCA 172.31.0.2 after repairs: first 3/4, RTT 21/25/30 ms; repeat 4/4, RTT 22/28/33 ms, TTL126.
+PCA tracert 172.31.1.2:
+1 0/0/0 ms 172.31.0.1
+2 23/19/20 ms 192.168.1.2
+3 15/18/20 ms 172.31.1.2
+Trace complete.
+Final score 100/100; 5/5 assessment items, each20points: RA tunnel IP, RA G0/0 IP, RA G0/0 mask, RA route, RB tunnel destination. RB source corrected too, not separately assessed.

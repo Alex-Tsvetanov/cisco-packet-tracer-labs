@@ -1,0 +1,6 @@
+configure terminal
+interface tunnel 0
+ tunnel source serial0/0/0
+ tunnel destination 209.165.122.2
+end
+write memory
